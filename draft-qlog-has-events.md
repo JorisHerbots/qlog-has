@@ -99,6 +99,8 @@ Definition:
 PlaybackPlayerInteraction = {
     state: InteractionState
     playhead: Playhead
+    playback_rate: float32
+    volume: float32
 }
 
 InteractionState = 
@@ -152,6 +154,7 @@ Definition:
 ~~~ cddl
 PlaybackPlayheadProgress = {
     playhead: Playhead
+    ? remaining: Playhead
 }
 ~~~
 
@@ -249,13 +252,14 @@ Emitted when the occupancy of a buffer changes
 Definition:
 
 ~~~ cddl
-BufferOccupancy = {
+BufferOccupancyUpdate = {
     media_type: mediaType
     buffer: Buffer
 }
 
 Buffer = {
     level_ms: uint16
+    ? target_ms: uint16
     ? level_frames: uint16
     ? level_bytes: uint16
 }
@@ -293,7 +297,7 @@ NetworkRequestUpdate = {
 }
 ~~~
 
-## abort
+## request_abort
 Importance: ??
 
 Emitted when a network request is aborted
@@ -301,7 +305,7 @@ Emitted when a network request is aborted
 Definition:
 
 ~~~ cddl
-NetworkAbort = {
+NetworkRequestAbort = {
     resource_url: string
 }
 ~~~
