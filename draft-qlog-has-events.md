@@ -40,14 +40,52 @@ Definition:
 
 ~~~ cddl
 PlaybackStreamInitialised = {
-    protocol: string
-    url: string
     autoplay: boolean
+}
+~~~
 
-    ? duration: uint16
-    ; filepath to manifest
+## stream_end
+Importance: ??
+
+Emitted when the playback of the media has ended.
+
+Definition:
+
+~~~ cddl
+PlaybackStreamEnd = {
+    playhead: Playhead
+}
+
+Playhead = {
+    ms: uint16
+    ? frames: uint16
+    ? bytes: uint16
+}
+~~~
+
+## metadata_loaded
+Importance: ??
+
+Emitted when the manifest and other metadata is loaded.
+
+Definition:
+
+~~~ cddl
+PlaybackMetadataLoaded = {
+    protocol: Protocol
+    url: string
+    ? media_duration: uint16
+    ; either a filepath to the manifest on the system
+    ; or a stringified representation of the manifest
     ? manifest: string
 }
+
+Protocol = 
+    "Progressive" /
+    "DASH" /
+    "HLS" /
+    "MSS" /
+    ...
 ~~~
 
 ## player_interaction
@@ -60,21 +98,38 @@ Definition:
 ~~~ cddl
 PlaybackPlayerInteraction = {
     state: InteractionState
-    playhead_ms: uint16
-    ? playhead_frame: uint16
-    ? playhead
+    playhead: Playhead
 }
 
 InteractionState = 
     "play" /
     "pause" /
     "seek" /
-    "speed" /
+    "playback_rate" /
     "volume" /
     "resize" 
 ~~~
 
-## rebuffer
+## player_state
+Importance: ??
+
+Emitted when there is an change of the playback state.
+
+Definition:
+
+~~~ cddl
+PlaybackPlayerState = {
+    state: PlaybackState
+    playhead: Playhead
+}
+
+PlaybackState = 
+    "playing" /
+    "paused" /
+    "stopped"
+~~~
+
+## stall
 Importance: ??
 
 Emitted when the playback stalls
@@ -82,23 +137,8 @@ Emitted when the playback stalls
 Definition:
 
 ~~~ cddl
-PlaybackRebuffer = [
-    playhead_ms: uint16
-    ? playhead_frame: uint16
-]
-~~~
-
-## stream_end
-Importance: ??
-
-Emitted when //
-
-Definition:
-
-~~~ cddl
-PlaybackStreamEnd = {
-    playhead_ms: uint16
-    ? playhead_frame: uint16
+PlaybackStall = {
+    playhead: Playhead
 }
 ~~~
 
@@ -111,46 +151,52 @@ Definition:
 
 ~~~ cddl
 PlaybackPlayheadProgress = {
-    playhead_ms: uint16
-    ? playhead_frame: uint16
-    ? playhead_bytes: uint16
+    playhead: Playhead
 }
 ~~~
 
 ## quality_changed
 Importance: ??
 
-Emitted when //
+Emitted when the representation being shown has changed
 
 Definition:
 
 ~~~ cddl
-
-~~~
-
-# Adaptive BitRate events
-
-## switch
-Importance: ??
-
-Emitted when the representation of the media changes
-
-Definition:
-
-~~~ cddl
-ABRSwitch = {
+PlaybackQualityChanged = {
     media_type: MediaType
-    ? from_id: string
-    ? from_bitrate: uint16
-    to_id: string
-    ? to_bitrate: uint16
+    to: Representation
+    ? from: Representation
+}
+
+Representation = {
+    id: string
+    ? bitrate: uint16
 }
 
 MediaType = 
     "video" /
     "audio" /
     "subtitles" /
+    "manifest" /
     "other"
+~~~
+
+# Adaptive BitRate events
+
+## RepresentationSwitch
+Importance: ??
+
+Emitted when the requested representation of the media changes
+
+Definition:
+
+~~~ cddl
+ABRRepresentationSwitch = {
+    media_type: MediaType
+    to: Representation
+    ? from: Representation
+}
 ~~~
 
 ## readystate_change
@@ -205,9 +251,13 @@ Definition:
 ~~~ cddl
 BufferOccupancy = {
     media_type: mediaType
-    playout_ms: uint16
-    ? playout_bytes: uint16
-    ? playout_frames: uint16
+    buffer: Buffer
+}
+
+Buffer = {
+    level_ms: uint16
+    ? level_frames: uint16
+    ? level_bytes: uint16
 }
 ~~~
 
@@ -222,9 +272,9 @@ Definition:
 
 ~~~ cddl
 NetworkRequest = {
-    resource_url: string
-    ? range: string
     media_type: MediaType
+    resource_url: string
+    ? request_range: string
 }
 ~~~
 
