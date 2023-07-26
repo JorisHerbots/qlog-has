@@ -39,7 +39,14 @@ Definition:
 ~~~ cddl
 PlaybackStreamInitialised = {
     autoplay: boolean
+    window_size: string
+    device: DeviceType
 }
+
+DeviceType = 
+    "pc" /
+    "handheld" /
+    "mobile"
 ~~~
 
 ## stream_end
@@ -94,8 +101,9 @@ Definition:
 PlaybackPlayerInteraction = {
     state: InteractionState
     playhead: Playhead
-    playback_rate: float32
-    volume: float32
+    ? playback_rate: float32
+    ? volume: float32
+    ? window_size: string
 }
 
 InteractionState = 
@@ -170,10 +178,7 @@ Representation = {
 
 MediaType = 
     "video" /
-    "audio" /
-    "subtitles" /
-    "manifest" /
-    "other"
+    "audio"
 ~~~
 
 # Adaptive BitRate events
@@ -262,10 +267,17 @@ Definition:
 
 ~~~ cddl
 NetworkRequest = {
-    media_type: MediaType
+    media_type: RequestType
     resource_url: string
     ? request_range: string
 }
+
+RequestType = 
+    "video" /
+    "audio" /
+    "subtitles" /
+    "manifest" /
+    "other"
 ~~~
 
 ## request_update
@@ -279,6 +291,7 @@ NetworkRequestUpdate = {
     resource_url: string
     bytes_received: uint16
     ? rtt: uint16
+    ? error: string
 }
 ~~~
 
